@@ -38,6 +38,8 @@
 #error Platform not supported
 #endif
 
+#include <ArduinoJson.h>
+
 #define DEBUGF(...) //Serial.printf(__VA_ARGS__)
 
 class AsyncWebServer;
@@ -49,6 +51,7 @@ class AsyncWebRewrite;
 class AsyncWebHandler;
 class AsyncStaticWebHandler;
 class AsyncCallbackWebHandler;
+class AsyncCallbackJsonWebHandler;
 class AsyncResponseStream;
 
 #ifndef WEBSERVER_H
@@ -69,6 +72,7 @@ typedef enum {
 
 typedef uint8_t WebRequestMethodComposite;
 typedef std::function<void(void)> ArDisconnectHandler;
+typedef std::function<void(AsyncWebServerRequest *request, JsonVariant &json)> ArJsonRequestHandlerFunction;
 
 /*
  * PARAMETER :: Chainable object to hold GET/POST and FILE parameters
@@ -410,8 +414,11 @@ class AsyncWebServer {
     AsyncCallbackWebHandler& on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest);
     AsyncCallbackWebHandler& on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest, ArUploadHandlerFunction onUpload);
     AsyncCallbackWebHandler& on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest, ArUploadHandlerFunction onUpload, ArBodyHandlerFunction onBody);
+    
+    AsyncCallbackJsonWebHandler& rest(const char* uri, ArJsonRequestHandlerFunction onRequest);
 
     AsyncStaticWebHandler& serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_control = NULL);
+
 
     void onNotFound(ArRequestHandlerFunction fn);  //called when handler is not assigned
     void onFileUpload(ArUploadHandlerFunction fn); //handle file uploads

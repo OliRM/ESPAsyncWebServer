@@ -29,7 +29,6 @@ bool ON_AP_FILTER(AsyncWebServerRequest *request) {
   return WiFi.localIP() != request->client()->localIP();
 }
 
-
 AsyncWebServer::AsyncWebServer(uint16_t port)
   : _server(port)
   , _rewrites(LinkedList<AsyncWebRewrite*>([](AsyncWebRewrite* r){ delete r; }))
@@ -153,6 +152,12 @@ AsyncCallbackWebHandler& AsyncWebServer::on(const char* uri, ArRequestHandlerFun
   AsyncCallbackWebHandler* handler = new AsyncCallbackWebHandler();
   handler->setUri(uri);
   handler->onRequest(onRequest);
+  addHandler(handler);
+  return *handler;
+}
+
+AsyncCallbackJsonWebHandler& AsyncWebServer::rest(const char* uri, ArJsonRequestHandlerFunction onRequest){
+  AsyncCallbackJsonWebHandler* handler = new AsyncCallbackJsonWebHandler(uri, onRequest);
   addHandler(handler);
   return *handler;
 }
